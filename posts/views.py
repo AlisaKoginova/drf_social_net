@@ -3,8 +3,15 @@ from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from posts.models import Post
-from posts.serializers import PostSerializer
+from posts.models import Post, Like
+from posts.serializers import PostSerializer, LikeSerializer
+
+
+class LikeListView(ListAPIView):
+    serializer_class = LikeSerializer
+    permission_classes = (AllowAny, )
+    queryset = Like.objects.order_by('-date')
+    pagination_class = LimitOffsetPagination
 
 
 class PostListView(ListAPIView):
@@ -37,16 +44,18 @@ class PostCreateView(CreateAPIView):
         return Response(response, status=status_code)
 
 
-
 class PostLikeView(RetrieveAPIView):
     serializer_class = PostSerializer
     permission_classes = (IsAuthenticated, )
 
     def get(self, request, post_id):
         post = Post.objects.get(id=self.kwargs.get('post_id'))
-        if request.user in post.liked_by.all():
+        if Like.objects.filter(user=request.user, post=post).all():
             post.liked_by.remove(request.user)
+            Like.objects.filter(user=request.user, post=post).delete()
         else:
+            like = Like.objects.create(user=request.user, post=post)
+            like.save()
             post.liked_by.add(request.user)
         post.save()
         status_code = status.HTTP_200_OK
