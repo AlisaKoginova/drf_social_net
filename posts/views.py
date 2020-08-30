@@ -51,12 +51,10 @@ class PostLikeView(RetrieveAPIView):
     def get(self, request, post_id):
         post = Post.objects.get(id=self.kwargs.get('post_id'))
         if Like.objects.filter(user=request.user, post=post).all():
-            post.liked_by.remove(request.user)
             Like.objects.filter(user=request.user, post=post).delete()
         else:
             like = Like.objects.create(user=request.user, post=post)
             like.save()
-            post.liked_by.add(request.user)
         post.save()
         status_code = status.HTTP_200_OK
         response = {
