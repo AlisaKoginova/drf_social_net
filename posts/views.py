@@ -65,3 +65,13 @@ class PostLikeView(RetrieveAPIView):
         }
 
         return Response(response, status=status_code)
+
+
+class LikeAnalyticsView(ListAPIView):
+    serializer_class = LikeSerializer
+    permission_classes = (AllowAny, )
+
+    def get_queryset(self):
+        from_date = self.kwargs['from_date']
+        to_date = self.kwargs['to_date']
+        return Like.objects.filter(date__range=[from_date, to_date])
