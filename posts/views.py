@@ -1,3 +1,8 @@
+import itertools
+from itertools import groupby
+
+from django.db.models import TimeField, Count
+from django.db.models.functions import TruncDate, Extract, TruncMonth
 from rest_framework import status
 from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView
 from rest_framework.pagination import LimitOffsetPagination
@@ -10,7 +15,7 @@ from posts.serializers import PostSerializer, LikeSerializer
 class LikeListView(ListAPIView):
     serializer_class = LikeSerializer
     permission_classes = (AllowAny, )
-    queryset = Like.objects.order_by('-date')
+    queryset = Like.objects.order_by('-created')
     pagination_class = LimitOffsetPagination
 
 
@@ -50,10 +55,10 @@ class PostLikeView(RetrieveAPIView):
 
     def get(self, request, post_id):
         post = Post.objects.get(id=self.kwargs.get('post_id'))
-        if Like.objects.filter(user=request.user, post=post).all():
-            Like.objects.filter(user=request.user, post=post).delete()
+        if Like.objects.filter(author=request.user, post=post).all():
+            Like.objects.filter(author=request.user, post=post).delete()
         else:
-            like = Like.objects.create(user=request.user, post=post)
+            like = Like.objects.create(author=request.user, post=post)
             like.save()
         post.save()
         status_code = status.HTTP_200_OK
@@ -65,13 +70,17 @@ class PostLikeView(RetrieveAPIView):
         }
 
         return Response(response, status=status_code)
-
+from django.db.models.aggregates import Count
+from django.db.models import DateField, Case, F
 
 class LikeAnalyticsView(ListAPIView):
     serializer_class = LikeSerializer
     permission_classes = (AllowAny, )
 
     def get_queryset(self):
+
         from_date = self.kwargs['from_date']
         to_date = self.kwargs['to_date']
-        return Like.objects.filter(date__range=[from_date, to_date])
+        filtered = Like.objects.filter(created__range=[from_date, to_date])
+
+        return filtered
