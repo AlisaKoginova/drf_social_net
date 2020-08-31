@@ -7,9 +7,6 @@ from django.contrib.auth.base_user import (
 class UserManager(BaseUserManager):
 
     def create_user(self, email, password=None):
-        """
-        Creates and saves a User with the given email and password.
-        """
         if not email:
             raise ValueError('Users Must Have an email address')
 
@@ -22,9 +19,6 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None):
-        """
-        Creates and saves a superuser with the given email and password.
-        """
         if not password:
             raise TypeError('Superusers must have a password.')
 
