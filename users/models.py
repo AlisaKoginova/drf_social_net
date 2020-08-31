@@ -45,6 +45,7 @@ class User(AbstractBaseUser):
     )
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    last_activity = models.DateTimeField(auto_now_add=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

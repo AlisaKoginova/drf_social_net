@@ -92,6 +92,7 @@ class LastLoginView(RetrieveAPIView):
                     'first_name': user_profile.first_name,
                     'last_name': user_profile.last_name,
                     'last_login': user_profile.user.last_login,
+                    'last_activity': user_profile.user.last_activity,
                     }]
                 }
 
