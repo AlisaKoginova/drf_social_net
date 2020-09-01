@@ -1,8 +1,4 @@
-import itertools
-from itertools import groupby
 
-from django.db.models import TimeField, Count
-from django.db.models.functions import TruncDate, Extract, TruncMonth
 from rest_framework import status
 from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView
 from rest_framework.pagination import LimitOffsetPagination
@@ -70,8 +66,7 @@ class PostLikeView(RetrieveAPIView):
         }
 
         return Response(response, status=status_code)
-from django.db.models.aggregates import Count
-from django.db.models import DateField, Case, F
+    
 
 class LikeAnalyticsView(ListAPIView):
     serializer_class = LikeSerializer
